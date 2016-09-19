@@ -7,12 +7,28 @@
     tools:context=".activity.MainActivity">
 
     <!--Content-->
-    <FrameLayout
-        android:id="@+id/contentContainer"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
 
-    <!--Menu-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            android:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+        <FrameLayout
+            android:id="@+id/contentContainer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </LinearLayout>
+
+    <!--Drawer Menu-->
     <LinearLayout
         android:layout_width="@dimen/drawer_menu_width"
         android:layout_height="match_parent"
