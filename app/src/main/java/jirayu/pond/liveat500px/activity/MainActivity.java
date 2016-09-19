@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
 
         actionBarDrawerToggle = new ActionBarDrawerToggle(MainActivity.this,
                 drawerLayout,
-                R.string.open_drawer,       
+                R.string.open_drawer,
                 R.string.close_drawer
         );
         drawerLayout.setDrawerListener(actionBarDrawerToggle);
@@ -60,8 +60,9 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (actionBarDrawerToggle.onOptionsItemSelected(item))
+        if (actionBarDrawerToggle.onOptionsItemSelected(item)){
             return true;
+        }
         return super.onOptionsItemSelected(item);
     }
 }
