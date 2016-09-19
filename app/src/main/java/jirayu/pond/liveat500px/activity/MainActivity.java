@@ -58,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
         actionBarDrawerToggle.onConfigurationChanged(newConfig);
     }
 
+    // การ Handle click ของที่อยู่บน Action Bar
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (actionBarDrawerToggle.onOptionsItemSelected(item)){
