@@ -8,12 +8,15 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.inthecheesefactory.thecheeselibrary.manager.Contextor;
+
 import java.io.IOException;
 
 import jirayu.pond.liveat500px.R;
 import jirayu.pond.liveat500px.adapter.PhotoListAdapter;
 import jirayu.pond.liveat500px.dao.PhotoItemCollectionDao;
 import jirayu.pond.liveat500px.manager.HttpManager;
+import jirayu.pond.liveat500px.manager.PhotoListManager;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -59,14 +62,17 @@ public class MainFragment extends Fragment {
                                    Response<PhotoItemCollectionDao> response) {
                 if (response.isSuccessful()){
                     PhotoItemCollectionDao dao = response.body();
-                    Toast.makeText(getActivity(),
+                    PhotoListManager.getInstance().setDao(dao);
+                    listAdapter.notifyDataSetChanged();
+
+                    Toast.makeText(Contextor.getInstance().getContext(),
                             dao.getData().get(0).getCaption(),
                             Toast.LENGTH_SHORT)
                             .show();
                 } else {
                     // Handle
                     try {
-                        Toast.makeText(getActivity(),
+                        Toast.makeText(Contextor.getInstance().getContext(),
                                 response.errorBody().string(),
                                 Toast.LENGTH_SHORT)
                                 .show();
@@ -78,7 +84,7 @@ public class MainFragment extends Fragment {
             @Override // ติดต่อ server ไม่ได้
             public void onFailure(Call<PhotoItemCollectionDao> call, Throwable t) {
                 // Handle
-                Toast.makeText(getActivity(),
+                Toast.makeText(Contextor.getInstance().getContext(),
                         t.toString(),
                         Toast.LENGTH_SHORT)
                         .show();
