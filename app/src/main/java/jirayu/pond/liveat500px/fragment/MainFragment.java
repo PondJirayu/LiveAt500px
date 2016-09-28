@@ -6,9 +6,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.Toast;
+
+import java.io.IOException;
 
 import jirayu.pond.liveat500px.R;
 import jirayu.pond.liveat500px.adapter.PhotoListAdapter;
+import jirayu.pond.liveat500px.dao.PhotoItemCollectionDao;
+import jirayu.pond.liveat500px.manager.HttpManager;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * Created by nuuneoi on 11/16/2014.
@@ -42,6 +50,40 @@ public class MainFragment extends Fragment {
         listView = (ListView) rootView.findViewById(R.id.listView);
         listAdapter = new PhotoListAdapter(); // สร้าง Adapter
         listView.setAdapter(listAdapter); // เอา ListView มาผูกกับ Adapter (สั่งให้ทำงานคู่กัน)
+
+        // เชื่อมต่อกับ Server
+        Call<PhotoItemCollectionDao> call = HttpManager.getInstance().getService().loadPhotoList();
+        call.enqueue(new Callback<PhotoItemCollectionDao>() {
+            @Override // ถูกเรียกเมือมีการติดต่อกับ server สำเร็จ
+            public void onResponse(Call<PhotoItemCollectionDao> call,
+                                   Response<PhotoItemCollectionDao> response) {
+                if (response.isSuccessful()){
+                    PhotoItemCollectionDao dao = response.body();
+                    Toast.makeText(getActivity(),
+                            dao.getData().get(0).getCaption(),
+                            Toast.LENGTH_SHORT)
+                            .show();
+                } else {
+                    // Handle
+                    try {
+                        Toast.makeText(getActivity(),
+                                response.errorBody().string(),
+                                Toast.LENGTH_SHORT)
+                                .show();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            @Override // ติดต่อ server ไม่ได้
+            public void onFailure(Call<PhotoItemCollectionDao> call, Throwable t) {
+                // Handle
+                Toast.makeText(getActivity(),
+                        t.toString(),
+                        Toast.LENGTH_SHORT)
+                        .show();
+            }
+        });
     }
 
     @Override

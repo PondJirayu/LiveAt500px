@@ -2,6 +2,8 @@ package jirayu.pond.liveat500px.manager;
 
 import android.content.Context;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.inthecheesefactory.thecheeselibrary.manager.Contextor;
 
 import jirayu.pond.liveat500px.manager.http.ApiService;
@@ -27,9 +29,14 @@ public class HttpManager {
     private HttpManager() {
         mContext = Contextor.getInstance().getContext();
 
+        // เปลี่ยนแปลง DateFormat
+        Gson gson = new GsonBuilder()
+                .setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
+                .create();
+
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("http://nuuneoi.com/courses/500px/")
-                .addConverterFactory(GsonConverterFactory.create()) // ยัด GsonConverter ให้ Retrofit เอาไปใช้งาน
+                .addConverterFactory(GsonConverterFactory.create(gson)) // ยัด gsonConverter ให้ Retrofit เอาไปใช้งาน
                 .build();
 
         service = retrofit.create(ApiService.class);
