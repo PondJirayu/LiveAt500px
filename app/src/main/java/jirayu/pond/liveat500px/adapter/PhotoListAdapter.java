@@ -27,12 +27,12 @@ public class PhotoListAdapter extends BaseAdapter {
     }
 //
 //    @Override
-//    public int getViewTypeCount() {
+//    public int getViewTypeCount() { // จำนวนประเภทของ View ใน ListView
 //        return 2;
 //    }
 //
 //    @Override
-//    public int getItemViewType(int position) {
+//    public int getItemViewType(int position) { // ถ้า ListView ส่ง Position เป็นเลขคู่ให้ return 0(PhotoListItem) ถ้าไม่ใช่ให้ return 1(TextView)
 //        return position % 2 == 0 ? 0 : 1;
 //    }
 
@@ -41,8 +41,10 @@ public class PhotoListAdapter extends BaseAdapter {
 //        if (getItemViewType(position) == 0) {
             PhotoListItem item;
             if (convertView != null) {
+                // Reuse
                 item = (PhotoListItem) convertView;
             } else {
+                // Create
                 item = new PhotoListItem(parent.getContext());
             }
             return item;
