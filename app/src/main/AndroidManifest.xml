@@ -21,6 +21,9 @@
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="ac9501e33cd0a953452c6e8348aa75947a706845" />
+        <meta-data
+            android:name="jirayu.pond.liveat500px.configuration.GlideConfiguration"
+            android:value="GlideModule" />
     </application>
 
 </manifest>
