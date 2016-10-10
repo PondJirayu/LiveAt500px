@@ -57,15 +57,15 @@ public class MainFragment extends Fragment {
         // เชื่อมต่อกับ Server
         Call<PhotoItemCollectionDao> call = HttpManager.getInstance().getService().loadPhotoList();
         call.enqueue(new Callback<PhotoItemCollectionDao>() {
-            @Override // ถูกเรียกเมือมีการติดต่อกับ server สำเร็จ
+            @Override // onResponse ถูกเรียกเมือมีการติดต่อกับ server สำเร็จ
             public void onResponse(Call<PhotoItemCollectionDao> call,
                                    Response<PhotoItemCollectionDao> response) {
-                if (response.isSuccessful()){
-                    PhotoItemCollectionDao dao = response.body();
-                    PhotoListManager.getInstance().setDao(dao);
+                if (response.isSuccessful()){ // แงะข้อมูลจาก response isSuccessful คือ ได้ข้อมูลกลับมาสมบูรณ์
+                    PhotoItemCollectionDao dao = response.body(); // แงะข้อมูลจาก response.body เก็บไว้ที่ dao
+                    PhotoListManager.getInstance().setDao(dao); // เอาข้อมูลจาก dao ไปฝากไว้ที่ global variable(PhotoListManager) เพื่อแชร์ให้ระบบอื่นๆใช้งานข้อมูลได้
                     listAdapter.notifyDataSetChanged();
 
-                    Toast.makeText(Contextor.getInstance().getContext(),
+                    Toast.makeText(Contextor.getInstance().getContext(), // Use Application Context
                             dao.getData().get(0).getCaption(),
                             Toast.LENGTH_SHORT)
                             .show();
@@ -81,7 +81,7 @@ public class MainFragment extends Fragment {
                     }
                 }
             }
-            @Override // ติดต่อ server ไม่ได้
+            @Override // ติดต่อ server ไม่ได้ [ แงะ Error Message จาก Throwable t ได้ ]
             public void onFailure(Call<PhotoItemCollectionDao> call, Throwable t) {
                 // Handle
                 Toast.makeText(Contextor.getInstance().getContext(),

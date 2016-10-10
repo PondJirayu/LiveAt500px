@@ -36,7 +36,7 @@ public class HttpManager {
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("http://nuuneoi.com/courses/500px/")
-                .addConverterFactory(GsonConverterFactory.create(gson)) // ยัด gsonConverter ให้ Retrofit เอาไปใช้งาน
+                .addConverterFactory(GsonConverterFactory.create(gson)) // ยัด GsonConverter ให้ Retrofit เอาไปใช้งาน
                 .build();
 
         service = retrofit.create(ApiService.class);

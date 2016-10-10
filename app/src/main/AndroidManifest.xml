@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="jirayu.pond.liveat500px">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:name=".MainApplication"
         android:allowBackup="true"
@@ -21,5 +23,4 @@
             android:value="ac9501e33cd0a953452c6e8348aa75947a706845" />
     </application>
 
-    <uses-permission android:name="android.permission.INTERNET" />
 </manifest>
