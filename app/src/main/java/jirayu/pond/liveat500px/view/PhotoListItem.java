@@ -120,7 +120,7 @@ public class PhotoListItem extends BaseCustomViewGroup {
     }
 
     public void setImageUrl(String url) {
-        // Load รูปใส่ imageView
+        // Glide Load รูปจาก url เข้าสู่ imageView
         Glide.with(getContext())
                 .load(url)
                 .into(ivImg);
