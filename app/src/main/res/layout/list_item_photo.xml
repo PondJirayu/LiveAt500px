@@ -27,7 +27,6 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:maxLines="2"
-            android:text="Name Name Name Name"
             android:textColor="@android:color/white"
             android:textSize="24sp" />
 
@@ -37,7 +36,6 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:maxLines="2"
-            android:text="Description Description Description"
             android:textColor="@android:color/white"
             android:textSize="18sp" />
 

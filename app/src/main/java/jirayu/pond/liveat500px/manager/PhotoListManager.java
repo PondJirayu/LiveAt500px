@@ -8,6 +8,7 @@ import jirayu.pond.liveat500px.dao.PhotoItemCollectionDao;
 
 /**
  * Created by nuuneoi on 11/16/2014.
+ * PhotoListManager ก็คือ Singleton Model ที่มีหน้าที่ถือครองตัวแปร dao ให้ตัวอื่นๆ เรียกใช้งานผ่าน getter
  */
 public class PhotoListManager {
 

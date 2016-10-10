@@ -57,7 +57,7 @@ public class PhotoListAdapter extends BaseAdapter {
         }
         // set value
         PhotoItemDao dao = (PhotoItemDao) getItem(position);
-        item.setNameText(dao.getCaption());
+        item.setNameText(dao.getCaption()); // set ค่าให้ view ใน customViewGroup
         item.setDescriptionText(dao.getUsername() + "\n" + dao.getCamera());
         item.setImageUrl(dao.getImageUrl());
 

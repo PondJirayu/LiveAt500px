@@ -58,7 +58,6 @@ public class PhotoListItem extends BaseCustomViewGroup {
         tvName = (TextView) findViewById(R.id.tvName);
         tvDescription = (TextView) findViewById(R.id.tvDescription);
         ivImg = (ImageView) findViewById(R.id.ivImg);
-
     }
 
     private void initWithAttrs(AttributeSet attrs, int defStyleAttr, int defStyleRes) {

@@ -60,10 +60,10 @@ public class MainFragment extends Fragment {
             @Override // onResponse ถูกเรียกเมือมีการติดต่อกับ server สำเร็จ
             public void onResponse(Call<PhotoItemCollectionDao> call,
                                    Response<PhotoItemCollectionDao> response) {
-                if (response.isSuccessful()){ // แงะข้อมูลจาก response isSuccessful คือ ได้ข้อมูลกลับมาสมบูรณ์
+                if (response.isSuccessful()){ // response.isSuccessful คือ ได้ข้อมูลกลับมาสมบูรณ์
                     PhotoItemCollectionDao dao = response.body(); // แงะข้อมูลจาก response.body เก็บไว้ที่ dao
-                    PhotoListManager.getInstance().setDao(dao); // เอาข้อมูลจาก dao ไปฝากไว้ที่ global variable(PhotoListManager) เพื่อแชร์ให้ระบบอื่นๆใช้งานข้อมูลได้
-                    listAdapter.notifyDataSetChanged();
+                    PhotoListManager.getInstance().setDao(dao); // เอา dao ไปฝากไว้ที่ global variable(PhotoListManager) เพื่อแชร์ให้ระบบอื่นๆใช้งานข้อมูลได้
+                    listAdapter.notifyDataSetChanged(); // adapter สั่งให้ listView refresh ตัวเอง
 
                     Toast.makeText(Contextor.getInstance().getContext(), // Use Application Context
                             dao.getData().get(0).getCaption(),
