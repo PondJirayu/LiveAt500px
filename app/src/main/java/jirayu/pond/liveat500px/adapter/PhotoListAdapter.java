@@ -80,7 +80,6 @@ public class PhotoListAdapter extends BaseAdapter {
             lastPosition = position;
         }
 
-
         return item;
 //        } else {
 //            TextView item;
