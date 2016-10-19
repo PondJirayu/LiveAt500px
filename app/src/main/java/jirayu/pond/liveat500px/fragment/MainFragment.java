@@ -62,7 +62,8 @@ public class MainFragment extends Fragment {
                                    Response<PhotoItemCollectionDao> response) {
                 if (response.isSuccessful()){ // response.isSuccessful คือ ได้ข้อมูลกลับมาสมบูรณ์
                     PhotoItemCollectionDao dao = response.body(); // แงะข้อมูลจาก response.body เก็บไว้ที่ dao
-                    PhotoListManager.getInstance().setDao(dao); // เอา dao ไปฝากไว้ที่ global variable(PhotoListManager) เพื่อแชร์ให้ระบบอื่นๆใช้งานข้อมูลได้
+                    listAdapter.setDao(dao); // โยน dao ให้ Adapter
+//                    PhotoListManager.getInstance().setDao(dao); // เอา dao ไปฝากไว้ที่ global variable(PhotoListManager) เพื่อแชร์ให้ระบบอื่นๆใช้งานข้อมูลได้
                     listAdapter.notifyDataSetChanged(); // adapter สั่งให้ listView refresh ตัวเอง
 
                     Toast.makeText(Contextor.getInstance().getContext(), // Use Application Context

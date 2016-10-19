@@ -123,6 +123,7 @@ public class PhotoListItem extends BaseCustomViewGroup {
         // Glide Load รูปจาก url เข้าสู่ imageView
         Glide.with(getContext())
                 .load(url)
+                .placeholder(R.drawable.loading)
                 .into(ivImg);
     }
 }
