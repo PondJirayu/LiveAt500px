@@ -7,7 +7,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AbsListView;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -33,6 +36,8 @@ public class MainFragment extends Fragment {
     PhotoListAdapter listAdapter;
     SwipeRefreshLayout swipeRefreshLayout;
     PhotoListManager photoListManager;
+    Button btnNewPhotos;
+    Animation anim;
 
     public MainFragment() {
         super();
@@ -55,6 +60,16 @@ public class MainFragment extends Fragment {
 
     private void initInstances(View rootView) {
         photoListManager = new PhotoListManager();
+
+        btnNewPhotos = (Button) rootView.findViewById(R.id.btnNewPhotos);
+        btnNewPhotos.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listView.smoothScrollToPosition(0);
+                hideButtonNewPhotos();
+            }
+        });
+
         // Init 'View' instance(s) with rootView.findViewById here
         listView = (ListView) rootView.findViewById(R.id.listView);
         listAdapter = new PhotoListAdapter(); // สร้าง Adapter
@@ -74,6 +89,7 @@ public class MainFragment extends Fragment {
             public void onScrollStateChanged(AbsListView view, int scrollState) {
 
             }
+
             @Override // ถ้ามีการ scroll ใน list view คำสั่ง onScroll จะถูกเรียก
             public void onScroll(AbsListView view,
                                  int firstVisibleItem,  // ตำแหน่งแรกที่ถูกแสดงผล
@@ -134,6 +150,10 @@ public class MainFragment extends Fragment {
                     listAdapter.increaseLastPosition(additionalSize);
                     listView.setSelectionFromTop(firstVisiblePosition + additionalSize,
                             top);
+
+                    // Show Button NewPhotos
+                    if (additionalSize > 0)
+                        showButtonNewPhotos();
                 } else {
 
                 }
@@ -208,5 +228,17 @@ public class MainFragment extends Fragment {
         if (savedInstanceState != null) {
             // Restore Instance State here
         }
+    }
+
+    public void showButtonNewPhotos() {
+        anim = AnimationUtils.loadAnimation(getActivity(), R.anim.zoom_fade_in);
+        btnNewPhotos.startAnimation(anim);
+        btnNewPhotos.setVisibility(Button.VISIBLE);
+    }
+
+    public void hideButtonNewPhotos() {
+        anim = AnimationUtils.loadAnimation(getActivity(), R.anim.zoom_fade_out);
+        btnNewPhotos.startAnimation(anim);
+        btnNewPhotos.setVisibility(Button.GONE);
     }
 }
