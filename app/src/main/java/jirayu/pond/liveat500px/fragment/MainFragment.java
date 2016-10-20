@@ -3,6 +3,7 @@ package jirayu.pond.liveat500px.fragment;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,10 +60,12 @@ public class MainFragment extends Fragment {
         listAdapter = new PhotoListAdapter(); // สร้าง Adapter
         listView.setAdapter(listAdapter); // เอา ListView มาผูกกับ Adapter (สั่งให้ทำงานคู่กัน)
 
+
         swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeRefreshLayout);
+        // Handle Pull to Refresh
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
-            public void onRefresh() {
+            public void onRefresh() { // ถ้ามีการ pull to refresh คำสั่งนี้จะถูกเรียก
                 // เชื่อมต่อกับ Server
                 refreshData();
             }
@@ -72,10 +75,13 @@ public class MainFragment extends Fragment {
             public void onScrollStateChanged(AbsListView view, int scrollState) {
 
             }
+            @Override // ถ้ามีการ scroll ใน list view คำสั่ง onScroll จะถูกเรียก
+            public void onScroll(AbsListView view,
+                                 int firstVisibleItem,  // ตำแหน่งแรกที่ถูกแสดงผล
+                                 int visibleItemCount,  // จำนวนไอเทมที่มองเห็นบนหน้าจอ
+                                 int totalItemCount) {  // จำนวนไอเทมทั้งหมด
 
-            @Override
-            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-                swipeRefreshLayout.setEnabled(firstVisibleItem == 0);
+                swipeRefreshLayout.setEnabled(firstVisibleItem == 0); // ให้ pull to refresh ทำงานเมื่อ scroll ที่ไอเทมตำแหน่งแรก
             }
         });
 
@@ -97,7 +103,9 @@ public class MainFragment extends Fragment {
         call.enqueue(new Callback<PhotoItemCollectionDao>() {
             @Override
             public void onResponse(Call<PhotoItemCollectionDao> call, Response<PhotoItemCollectionDao> response) {
+
                 swipeRefreshLayout.setRefreshing(false); // สั่งให้ Pull to Refresh หยุดหมุน
+
                 if (response.isSuccessful()) { // response.isSuccessful คือ ได้ข้อมูลกลับมาสมบูรณ์
                     PhotoItemCollectionDao dao = response.body(); // แงะข้อมูลจาก response.body เก็บไว้ที่ dao
                     photoListManager.setDao(dao);
@@ -126,6 +134,7 @@ public class MainFragment extends Fragment {
             public void onFailure(Call<PhotoItemCollectionDao> call, Throwable t) {
                 // Handle
                 swipeRefreshLayout.setRefreshing(false); // สั่งให้ Pull to Refresh หยุดหมุน
+
                 Toast.makeText(Contextor.getInstance().getContext(),
                         t.toString(),
                         Toast.LENGTH_SHORT)
@@ -139,7 +148,9 @@ public class MainFragment extends Fragment {
         call.enqueue(new Callback<PhotoItemCollectionDao>() {
             @Override // onResponse ถูกเรียกเมือมีการติดต่อกับ server สำเร็จ
             public void onResponse(Call<PhotoItemCollectionDao> call, Response<PhotoItemCollectionDao> response) {
+
                 swipeRefreshLayout.setRefreshing(false); // สั่งให้ Pull to Refresh หยุดหมุน
+
                 if (response.isSuccessful()) { // response.isSuccessful คือ ได้ข้อมูลกลับมาสมบูรณ์
                     PhotoItemCollectionDao dao = response.body(); // แงะข้อมูลจาก response.body เก็บไว้ที่ dao
                     photoListManager.setDao(dao);
@@ -168,6 +179,7 @@ public class MainFragment extends Fragment {
             public void onFailure(Call<PhotoItemCollectionDao> call, Throwable t) {
                 // Handle
                 swipeRefreshLayout.setRefreshing(false); // สั่งให้ Pull to Refresh หยุดหมุน
+
                 Toast.makeText(Contextor.getInstance().getContext(),
                         t.toString(),
                         Toast.LENGTH_SHORT)
