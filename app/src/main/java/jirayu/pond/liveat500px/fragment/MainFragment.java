@@ -231,13 +231,13 @@ public class MainFragment extends Fragment {
     }
 
     public void showButtonNewPhotos() {
-        anim = AnimationUtils.loadAnimation(getActivity(), R.anim.zoom_fade_in);
+        anim = AnimationUtils.loadAnimation(Contextor.getInstance().getContext(), R.anim.zoom_fade_in);
         btnNewPhotos.startAnimation(anim);
         btnNewPhotos.setVisibility(Button.VISIBLE);
     }
 
     public void hideButtonNewPhotos() {
-        anim = AnimationUtils.loadAnimation(getActivity(), R.anim.zoom_fade_out);
+        anim = AnimationUtils.loadAnimation(Contextor.getInstance().getContext(), R.anim.zoom_fade_out);
         btnNewPhotos.startAnimation(anim);
         btnNewPhotos.setVisibility(Button.GONE);
     }
