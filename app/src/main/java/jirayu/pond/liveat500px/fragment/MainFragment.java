@@ -3,7 +3,6 @@ package jirayu.pond.liveat500px.fragment;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,12 +31,19 @@ import retrofit2.Response;
  */
 public class MainFragment extends Fragment {
 
+    /***********
+     * Variables
+     ************/
     ListView listView;
     PhotoListAdapter listAdapter;
     SwipeRefreshLayout swipeRefreshLayout;
     PhotoListManager photoListManager;
     Button btnNewPhotos;
     Animation anim;
+
+    /************
+     * Functions
+     *************/
 
     public MainFragment() {
         super();
@@ -62,13 +68,7 @@ public class MainFragment extends Fragment {
         photoListManager = new PhotoListManager();
 
         btnNewPhotos = (Button) rootView.findViewById(R.id.btnNewPhotos);
-        btnNewPhotos.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                listView.smoothScrollToPosition(0);
-                hideButtonNewPhotos();
-            }
-        });
+        btnNewPhotos.setOnClickListener(buttonClickListener);
 
         // Init 'View' instance(s) with rootView.findViewById here
         listView = (ListView) rootView.findViewById(R.id.listView);
@@ -77,34 +77,9 @@ public class MainFragment extends Fragment {
 
         swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeRefreshLayout);
         // Handle Pull to Refresh
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() { // ถ้ามีการ pull to refresh คำสั่งนี้จะถูกเรียก
-                // เชื่อมต่อกับ Server
-                refreshData();
-            }
-        });
-        listView.setOnScrollListener(new AbsListView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(AbsListView view, int scrollState) {
+        swipeRefreshLayout.setOnRefreshListener(pullToRefreshListener);
 
-            }
-
-            @Override // ถ้ามีการ scroll ใน list view คำสั่ง onScroll จะถูกเรียก
-            public void onScroll(AbsListView view,
-                                 int firstVisibleItem,  // ตำแหน่งแรกที่ถูกแสดงผล
-                                 int visibleItemCount,  // จำนวนไอเทมที่มองเห็นบนหน้าจอ
-                                 int totalItemCount) {  // จำนวนไอเทมทั้งหมด
-
-                swipeRefreshLayout.setEnabled(firstVisibleItem == 0); // ให้ pull to refresh ทำงานเมื่อ scroll ที่ไอเทมตำแหน่งแรก
-                if (firstVisibleItem + visibleItemCount >= totalItemCount) {
-                    if (photoListManager.getCount() > 0){
-                        // Load More
-                        loadMoreData();
-                    }
-                }
-            }
-        });
+        listView.setOnScrollListener(listViewScrollListener);
 
         // เชื่อมต่อกับ Server
         refreshData();
@@ -118,94 +93,6 @@ public class MainFragment extends Fragment {
         }
     }
 
-    class PhotoListLoadCallback implements Callback<PhotoItemCollectionDao> {
-
-        public static final int MODE_RELOAD = 1;
-        public static final int MODE_RELOAD_NEWER = 2;
-        public static final int MODE_LOAD_MORE = 3;
-
-        int mode;
-
-        public PhotoListLoadCallback(int mode) {
-            this.mode = mode;
-        }
-
-        @Override
-        public void onResponse(Call<PhotoItemCollectionDao> call, Response<PhotoItemCollectionDao> response) {
-
-            swipeRefreshLayout.setRefreshing(false); // สั่งให้ Pull to Refresh หยุดหมุน
-
-            if (response.isSuccessful()) {  // response.isSuccessful คือ ได้ข้อมูลกลับมาสมบูรณ์
-                PhotoItemCollectionDao dao = response.body();   // แงะข้อมูลจาก response.body เก็บไว้ที่ dao
-
-                int firstVisiblePosition = listView.getFirstVisiblePosition(); // get ตำแหน่งแรกสุดที่ถูกแสดงผลบน list view
-                View c = listView.getChildAt(0); // หาค่าตำแหน่งแรกว่า scroll พ้นขอบจอกี่ px
-                int top = (c == null) ? 0 : c.getTop();
-
-                if (mode == MODE_RELOAD_NEWER) {
-                    photoListManager.insertDaoAtPosition(dao);   // ส่งข้อมูลไปวิเคราะห์ใน model
-                } else if (mode == MODE_LOAD_MORE) {
-                    photoListManager.appendDaoAtButtonPosition(dao);
-                    isLoadingMore = false;
-                } else {
-                    photoListManager.setDao(dao);
-                }
-
-                listAdapter.setDao(photoListManager.getDao());    // โยน dao ให้ Adapter
-//                    PhotoListManager.getInstance().setDao(dao); // เอา dao ไปฝากไว้ที่ global variable(PhotoListManager) เพื่อแชร์ให้ระบบอื่นๆใช้งานข้อมูลได้
-                listAdapter.notifyDataSetChanged(); // adapter สั่งให้ listView refresh ตัวเอง
-
-                if (mode == MODE_RELOAD_NEWER) {
-                    // Maintain Scroll Position การ scroll ไปยังตำแหน่งที่ต้องการ
-                    int additionalSize = (dao != null && dao.getData() != null) ? dao.getData().size() : 0;
-                    listAdapter.increaseLastPosition(additionalSize);
-                    listView.setSelectionFromTop(firstVisiblePosition + additionalSize,
-                            top);
-
-                    // Show Button NewPhotos
-                    if (additionalSize > 0)
-                        showButtonNewPhotos();
-                } else {
-
-                }
-
-                Toast.makeText(Contextor.getInstance().getContext(), // Use Application Context
-                        "Load Completed",
-                        Toast.LENGTH_SHORT)
-                        .show();
-            } else {
-                // Handle
-                if (mode == MODE_LOAD_MORE){
-                    isLoadingMore = false;
-                }
-
-                try {
-                    Toast.makeText(Contextor.getInstance().getContext(),
-                            response.errorBody().string(),
-                            Toast.LENGTH_SHORT)
-                            .show();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
-        }
-
-        @Override
-        public void onFailure(Call<PhotoItemCollectionDao> call, Throwable t) {
-            // Handle
-            if (mode == MODE_LOAD_MORE) {
-                isLoadingMore = false;
-            }
-
-            swipeRefreshLayout.setRefreshing(false); // สั่งให้ Pull to Refresh หยุดหมุน
-
-            Toast.makeText(Contextor.getInstance().getContext(),
-                    t.toString(),
-                    Toast.LENGTH_SHORT)
-                    .show();
-        }
-    }
 
     private void reloadDataNewer() {
         int maxId = photoListManager.getMaximumId();
@@ -261,15 +148,152 @@ public class MainFragment extends Fragment {
         }
     }
 
-    public void showButtonNewPhotos() {
+    private void showButtonNewPhotos() {
         anim = AnimationUtils.loadAnimation(Contextor.getInstance().getContext(), R.anim.zoom_fade_in);
         btnNewPhotos.startAnimation(anim);
         btnNewPhotos.setVisibility(Button.VISIBLE);
     }
 
-    public void hideButtonNewPhotos() {
+    private void hideButtonNewPhotos() {
         anim = AnimationUtils.loadAnimation(Contextor.getInstance().getContext(), R.anim.zoom_fade_out);
         btnNewPhotos.startAnimation(anim);
         btnNewPhotos.setVisibility(Button.GONE);
     }
+
+    private void showToast(String text) {
+        Toast.makeText(Contextor.getInstance().getContext(),
+                text,
+                Toast.LENGTH_SHORT)
+                .show();
+
+    }
+
+    /***************
+    * Listener Zone
+     ***************/
+
+    View.OnClickListener buttonClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if (v == btnNewPhotos){
+                listView.smoothScrollToPosition(0);
+                hideButtonNewPhotos();
+            }
+        }
+    };
+
+    SwipeRefreshLayout.OnRefreshListener pullToRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
+        @Override
+        public void onRefresh() { // ถ้ามีการ pull to refresh คำสั่งนี้จะถูกเรียก
+            // เชื่อมต่อกับ Server
+            refreshData();
+        }
+    };
+
+    AbsListView.OnScrollListener listViewScrollListener = new AbsListView.OnScrollListener() {
+        @Override
+        public void onScrollStateChanged(AbsListView view, int scrollState) {
+
+        }
+
+        @Override // ถ้ามีการ scroll ใน list view คำสั่ง onScroll จะถูกเรียก
+        public void onScroll(AbsListView view,
+                             int firstVisibleItem,  // ตำแหน่งแรกที่ถูกแสดงผล
+                             int visibleItemCount,  // จำนวนไอเทมที่มองเห็นบนหน้าจอ
+                             int totalItemCount) {  // จำนวนไอเทมทั้งหมด
+            if (view == listView){
+                swipeRefreshLayout.setEnabled(firstVisibleItem == 0); // ให้ pull to refresh ทำงานเมื่อ scroll ที่ไอเทมตำแหน่งแรก
+                if (firstVisibleItem + visibleItemCount >= totalItemCount) {
+                    if (photoListManager.getCount() > 0) {
+                        // Load More
+                        loadMoreData();
+                    }
+                }
+            }
+        }
+    };
+
+    /**************
+     * Inner Class
+     **************/
+
+    class PhotoListLoadCallback implements Callback<PhotoItemCollectionDao> {
+
+        public static final int MODE_RELOAD = 1;
+        public static final int MODE_RELOAD_NEWER = 2;
+        public static final int MODE_LOAD_MORE = 3;
+
+        int mode;
+
+        public PhotoListLoadCallback(int mode) {
+            this.mode = mode;
+        }
+
+        @Override
+        public void onResponse(Call<PhotoItemCollectionDao> call, Response<PhotoItemCollectionDao> response) {
+
+            swipeRefreshLayout.setRefreshing(false); // สั่งให้ Pull to Refresh หยุดหมุน
+
+            if (response.isSuccessful()) {  // response.isSuccessful คือ ได้ข้อมูลกลับมาสมบูรณ์
+                PhotoItemCollectionDao dao = response.body();   // แงะข้อมูลจาก response.body เก็บไว้ที่ dao
+
+                int firstVisiblePosition = listView.getFirstVisiblePosition(); // get ตำแหน่งแรกสุดที่ถูกแสดงผลบน list view
+                View c = listView.getChildAt(0); // หาค่าตำแหน่งแรกว่า scroll พ้นขอบจอกี่ px
+                int top = (c == null) ? 0 : c.getTop();
+
+                if (mode == MODE_RELOAD_NEWER) {
+                    photoListManager.insertDaoAtPosition(dao);   // ส่งข้อมูลไปวิเคราะห์ใน model
+                } else if (mode == MODE_LOAD_MORE) {
+                    photoListManager.appendDaoAtButtonPosition(dao);
+                } else {
+                    photoListManager.setDao(dao);
+                }
+                clearLoadingMoreFlagIfCapable(mode);
+                listAdapter.setDao(photoListManager.getDao());    // โยน dao ให้ Adapter
+//                    PhotoListManager.getInstance().setDao(dao); // เอา dao ไปฝากไว้ที่ global variable(PhotoListManager) เพื่อแชร์ให้ระบบอื่นๆใช้งานข้อมูลได้
+                listAdapter.notifyDataSetChanged(); // adapter สั่งให้ listView refresh ตัวเอง
+
+                if (mode == MODE_RELOAD_NEWER) {
+                    // Maintain Scroll Position การ scroll ไปยังตำแหน่งที่ต้องการ
+                    int additionalSize = (dao != null && dao.getData() != null) ? dao.getData().size() : 0;
+                    listAdapter.increaseLastPosition(additionalSize);
+                    listView.setSelectionFromTop(firstVisiblePosition + additionalSize,
+                            top);
+
+                    // Show Button NewPhotos
+                    if (additionalSize > 0)
+                        showButtonNewPhotos();
+                } else {
+
+                }
+
+                showToast("Load Completed");
+
+            } else {
+                // Handle
+                clearLoadingMoreFlagIfCapable(mode);
+                try {
+                    showToast(response.errorBody().string());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        }
+
+        @Override
+        public void onFailure(Call<PhotoItemCollectionDao> call, Throwable t) {
+            // Handle
+            clearLoadingMoreFlagIfCapable(mode);
+            swipeRefreshLayout.setRefreshing(false); // สั่งให้ Pull to Refresh หยุดหมุน
+            showToast(t.toString());
+        }
+
+        private void clearLoadingMoreFlagIfCapable(int mode) {
+            if (mode == MODE_LOAD_MORE) {
+                isLoadingMore = false;
+            }
+        }
+    }
+
 }
