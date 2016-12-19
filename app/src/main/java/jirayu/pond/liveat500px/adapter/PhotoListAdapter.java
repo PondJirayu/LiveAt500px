@@ -19,8 +19,8 @@ import jirayu.pond.liveat500px.view.PhotoListItem;
  */
 public class PhotoListAdapter extends BaseAdapter {
 
-    PhotoItemCollectionDao dao;
-    int lastPosition = -1;
+    private PhotoItemCollectionDao dao;
+    private int lastPosition = -1;
 
     public void setDao(PhotoItemCollectionDao dao) {
         this.dao = dao;
